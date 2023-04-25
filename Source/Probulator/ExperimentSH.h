@@ -33,6 +33,80 @@ public:
 		m_radianceImage = Image(data.m_outputSize);
 		m_irradianceImage = Image(data.m_outputSize);
 
+		// const float A[5] = {
+		// 	pi,
+		// 	pi * 2.0f / 3.0f,
+		// 	pi * 1.0f / 4.0f,
+		// 	0.0f,
+		// 	-pi * 1.0f / 24.0f
+		// };
+		// for (int l = 0; l < L; ++l)
+		// {
+		// 	switch(l){
+		// 	case 4:
+		// 		for (int ii=0; ii<9; ++ii){
+		// 			m_shCoeffs[16+ii] = vec4(shRadiance.data[15+ii] * A[4], 0.f);
+		// 		}
+		// 		break;
+		// 	case 3:
+		// 		for (int ii=0; ii<7; ++ii){
+		// 			m_shCoeffs[9+ii] = vec4(shRadiance.data[9+ii] * A[3], 0.f);
+		// 		}
+		// 		break;
+		// 	case 2:
+		// 		for (int ii=0; ii<5; ++ii){
+		// 			m_shCoeffs[4+ii] = vec4(shRadiance.data[4+ii] * A[2], 0.f);
+		// 		}
+		// 		break;
+		// 	case 1:
+		// 		for (int ii=0; ii<3; ++ii){
+		// 			m_shCoeffs[1+ii] = vec4(shRadiance.data[1+ii] * A[1], 0.f);
+		// 		}
+		// 		break;
+		// 	default:
+		// 	case 0:
+		// 		m_shCoeffs[0] = vec4(shRadiance.data[0] * A[0], 0.f); break;
+		// 	}
+		// }
+
+		const int n = (L+1)*(L+1);
+		for (int ii=0; ii<n; ++ii){
+			m_shCoeffs[ii] = vec4(shRadiance.data[ii], 0.f);
+		}
+
+		auto irradiance_coeffs = [&shRadiance](vec3 n)
+		{
+			float c1 = 0.429043f;
+			float c2 = 0.511664f;
+			float c3 = 0.743125f;
+			float c4 = 0.886227f;
+			float c5 = 0.247708f;
+
+			vec3 L00;
+			vec3 L1_1, L10, L11;
+			vec3 L2_2, L2_1, L20, L21, L22;
+			//get_lighting_SH(L00, L1_1, L10, L11, L2_2, L2_1, L20, L21, L22);
+			L00  = shRadiance.data[0];
+
+			L1_1 = shRadiance.data[1];
+			L10  = shRadiance.data[2];
+			L11  = shRadiance.data[3];
+
+			L2_2 = shRadiance.data[4];
+			L2_1 = shRadiance.data[5];
+			L20  = shRadiance.data[6];
+			L21  = shRadiance.data[7];
+			L22  = shRadiance.data[8];
+
+			float x = n.x, y = n.y, z = n.z;
+			float x2 = x*x, y2 = y*y, z2 = z*z;
+			float xy = x*y, yz = y*z, xz = x*z;
+
+			return c1*L22*(x2-y2) + c3*L20*z2 + c4*L00 - c5*L20 
+					+ 2*c1*(L2_2*xy + L21*xz + L2_1*yz) 
+					+ 2*c2*(L11*x+L1_1*y+L10*z) ;
+		};
+
 		data.m_directionImage.forPixels2D([&](const vec3& direction, ivec2 pixelPos)
 		{
 			SphericalHarmonicsT<float, L> shDirection = shEvaluate<L>(direction);
@@ -41,6 +115,8 @@ public:
 			m_radianceImage.at(pixelPos) = vec4(sampleSh, 1.0f);
 
 			vec3 sampleIrradianceSh = max(vec3(0.0f), shEvaluateDiffuse<vec3, L>(shRadiance, direction) / pi);
+
+			//vec3 samplesh = max(vec3(0.f), irradiance_coeffs(direction) / pi);
 			m_irradianceImage.at(pixelPos) = vec4(sampleIrradianceSh, 1.0f);
 		});
 	}

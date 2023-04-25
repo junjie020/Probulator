@@ -91,6 +91,10 @@ void setCommonUniforms(const ShaderProgram& shaderProgram, const CommonShaderUni
 	setUniformByName(shaderProgram, "uResolution", uniforms.resolution);
 	setUniformByName(shaderProgram, "uViewMatrix", uniforms.viewMatrix);
 	setUniformByName(shaderProgram, "uViewProjMatrix", uniforms.viewProjMatrix);
+
+	if (uniforms.useSH){
+		setUniformByName(shaderProgram, "uSHCoeffs", uniforms.uSHCoeffs, 9);
+	}
 }
 
 CommonShaderPrograms::CommonShaderPrograms()
@@ -116,7 +120,7 @@ CommonShaderPrograms::CommonShaderPrograms()
 
 	auto vsModelDefault = createShaderFromFile(GL_VERTEX_SHADER, "Data/Shaders/Model.vert");
 	auto vsModelBasisVisualizer = createShaderFromFile(GL_VERTEX_SHADER, "Data/Shaders/BasisVisualizer.vert");
-	auto psModelLatLongIrradiance = createShaderFromFile(GL_FRAGMENT_SHADER, "Data/Shaders/Model.frag");
+	auto psModelLatLongIrradiance = createShaderFromFile(GL_FRAGMENT_SHADER, "Data/Shaders/ModelSH.frag");
 
 	modelIrradiance = createShaderProgram(*vsModelDefault, *psModelLatLongIrradiance, vfModel);
 	modelBasisVisualizer = createShaderProgram(*vsModelBasisVisualizer, *psModelLatLongIrradiance, vfModel);

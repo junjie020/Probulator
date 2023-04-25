@@ -219,6 +219,8 @@ public:
     Image m_radianceImage;
     Image m_irradianceImage;
     float m_irradianceMax = 0.0f;
+
+    vec4 m_shCoeffs[25];
 };
 
 typedef std::vector<std::unique_ptr<Experiment>> ExperimentList;

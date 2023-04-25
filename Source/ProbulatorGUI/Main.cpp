@@ -544,6 +544,10 @@ public:
 		filter.wrapV = GL_CLAMP_TO_EDGE;
 
 		m_irradianceTexture = createTextureFromImage(experiment->m_irradianceImage, filter);
+
+		for (int ii=0; ii<25; ++ii){
+			m_shaderUniforms.uSHCoeffs[ii] = experiment->m_shCoeffs[ii];
+		}
 	}
 
 	void loadEnvmap(const char* filename)
@@ -615,7 +619,8 @@ public:
 	std::unique_ptr<ChangeMonitor> m_shaderChangeMonitor;
 
 	std::string m_objectFilename = "Data/Models/bunny.obj";
-	std::string m_envmapFilename = "Data/Probes/wells.hdr";
+	//std::string m_envmapFilename = "Data/Probes/wells.hdr";
+	std::string m_envmapFilename = "Data/Probes/4x2.png";
 	ivec2 m_windowSize = ivec2(1280, 720);
 	ivec2 m_sceneViewport = ivec2(1, 1);
 	int m_menuWidth = 660;
@@ -640,7 +645,7 @@ public:
 	std::vector<std::string> m_availableExperimentNames;
 	Probulator::ExperimentList m_experimentList;
 	ExperimentResultsList m_experimentResultsList;
-	int m_currentExperiment = 0;
+	int m_currentExperiment = 8;
 	int m_previousExperiment = m_currentExperiment;
 
 	mat4 m_worldMatrix = mat4(1.0f);

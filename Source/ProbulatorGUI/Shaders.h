@@ -13,6 +13,9 @@ struct CommonShaderUniforms
 	mat4 viewMatrix = mat4(1.0f);
 	mat4 projMatrix = mat4(1.0f);
 	mat4 viewProjMatrix = mat4(1.0f);
+
+	vec4 uSHCoeffs[25];
+	bool useSH = true;
 };
 
 class CommonShaderPrograms : NonCopyable

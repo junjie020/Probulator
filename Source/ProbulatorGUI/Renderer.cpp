@@ -214,3 +214,11 @@ void setUniformByName(const ShaderProgram& shaderProgram, const char* name, cons
 	glUniform2fv(location, 1, glm::value_ptr(value));
 }
 
+void setUniformByName(const ShaderProgram& shaderProgram, const char* name, const vec4* value, u32 num)
+{
+	GLint location = glGetUniformLocation(shaderProgram.m_native, name); // TODO: cache uniform bindings
+	if (location == -1)
+		return ;
+	glUniform4fv(location, num, (const GLfloat*)value);
+}
+
