@@ -40,26 +40,66 @@ void get_lighting_SH(out vec3 L00,
 #endif //USE_DEFAULT
 }
 
+// vec3 irradiance_coeffs(vec3 n)
+// {
+// 	float c1 = 0.429043;
+// 	float c2 = 0.511664;
+// 	float c3 = 0.743125;
+// 	float c4 = 0.886227;
+// 	float c5 = 0.247708;
+
+//     vec3 L00;
+//     vec3 L1_1, L10, L11;
+//     vec3 L2_2, L2_1, L20, L21, L22;
+//     get_lighting_SH(L00, L1_1, L10, L11, L2_2, L2_1, L20, L21, L22);
+
+//     float x = n.x, y = n.y, z = n.z;
+// 	float x2 = x*x, y2 = y*y, z2 = z*z;
+// 	float xy = x*y, yz = y*z, xz = x*z;
+
+// 	return c1*L22*(x2-y2) + c3*L20*z2 + c4*L00 - c5*L20 
+//             + 2*c1*(L2_2*xy + L21*xz + L2_1*yz) 
+//             + 2*c2*(L11*x+L1_1*y+L10*z) ;
+// }
+
 vec3 irradiance_coeffs(vec3 n)
 {
-	float c1 = 0.429043;
-	float c2 = 0.511664;
-	float c3 = 0.743125;
-	float c4 = 0.886227;
-	float c5 = 0.247708;
-
     vec3 L00;
     vec3 L1_1, L10, L11;
     vec3 L2_2, L2_1, L20, L21, L22;
     get_lighting_SH(L00, L1_1, L10, L11, L2_2, L2_1, L20, L21, L22);
 
     float x = n.x, y = n.y, z = n.z;
-	float x2 = x*x, y2 = y*y, z2 = z*z;
-	float xy = x*y, yz = y*z, xz = x*z;
+    float x2 = x*x, y2 = y*y, z2 = z*z;
+    vec3 result = L00;
 
-	return c1*L22*(x2-y2) + c3*L20*z2 + c4*L00 - c5*L20 
-            + 2*c1*(L2_2*xy + L21*xz + L2_1*yz) 
-            + 2*c2*(L11*x+L1_1*y+L10*z) ;
+    result += L1_1 * -sqrt(3.0f/(4.0f*PI))*y + 
+              L10 *   sqrt(3.0f/(4.0f*PI))*z + 
+              L11 *  -sqrt(3.0f/(4.0f*PI))*x;
+
+    result += L2_2 *  sqrt(15.0f/( 4.0f*PI))*y*x +
+              L2_1 * -sqrt(15.0f/( 4.0f*PI))*y*z +
+              L20  *  sqrt( 5.0f/(16.0f*PI))*(3.0f*z2-1.0f) +
+              L21  * -sqrt(15.0f/( 4.0f*PI))*x*z +
+              L22  *  sqrt(15.0f/(16.0f*PI))*(x2-y2);
+
+    return result;
+
+    // if (L >= 1)
+    // {
+    //     result[i++] = -sqrt(3.0f/(4.0f*pi))*y;
+    //     result[i++] =  sqrt(3.0f/(4.0f*pi))*z;
+    //     result[i++] = -sqrt(3.0f/(4.0f*pi))*x;
+    // }
+
+    // if (L >= 2)
+    // {
+    //     result[i++] =  sqrt(15.0f/(4.0f*pi))*y*x;
+    //     result[i++] = -sqrt(15.0f/(4.0f*pi))*y*z;
+    //     result[i++] =  sqrt(5.0f/(16.0f*pi))*(3.0f*z2-1.0f);
+    //     result[i++] = -sqrt(15.0f/(4.0f*pi))*x*z;
+    //     result[i++] =  sqrt(15.0f/(16.0f*pi))*(x2-y2);
+    // }
 }
 
 void main()
