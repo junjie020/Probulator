@@ -69,23 +69,23 @@ public:
 		// 	}
 		// }
 
-		// const float A[5] = {
-		// 	pi,
-		// 	pi * 2.0f / 3.0f,
-		// 	pi * 1.0f / 4.0f,
-		// 	0.0f,
-		// 	-pi * 1.0f / 24.0f
-		// };
+		const float A[5] = {
+			pi,
+			pi * 2.0f / 3.0f,
+			pi * 1.0f / 4.0f,
+			0.0f,
+			-pi * 1.0f / 24.0f
+		};
 
-		// const int counts[5] = {1, 3, 5, 7, 9};
-		// int offset = 0;
-		// for (int l=0; l<L; ++l){
-		// 	int count = counts[l];
-		// 	for (int ii=offset; ii<count; ++ii){
-		// 		m_shCoeffs[ii] = vec4(shRadiance.data[ii] * A[l], 0.f);
-		// 	}
-		// 	offset += count;
-		// }
+		const int counts[5] = {1, 3, 5, 7, 9};
+		int offset = 0;
+		for (int l=0; l<L; ++l){
+			int count = counts[l];
+			for (int ii=offset; ii<count; ++ii){
+				m_shCoeffs[ii] = vec4(shRadiance.data[ii] * A[l], 0.f);
+			}
+			offset += count;
+		}
 
 		// const int n = (L+1)*(L+1);
 		// for (int ii=0; ii<n; ++ii){
@@ -125,49 +125,43 @@ public:
 		// 			+ 2*c2*(L11*x+L1_1*y+L10*z) ;
 		// };
 
-		auto irradiance_coeffs = [&shRadiance](vec3 n)
-		{
-			vec3 L00;
-			vec3 L1_1, L10, L11;
-			vec3 L2_2, L2_1, L20, L21, L22;
-			//get_lighting_SH(L00, L1_1, L10, L11, L2_2, L2_1, L20, L21, L22);
-			L00  = shRadiance.data[0];
+		// auto irradiance_coeffs = [this](vec3 n)
+		// {
+		// 	vec3 L00;
+		// 	vec3 L1_1, L10, L11;
+		// 	vec3 L2_2, L2_1, L20, L21, L22;
+		// 	//get_lighting_SH(L00, L1_1, L10, L11, L2_2, L2_1, L20, L21, L22);
+		// 	L00  = vec3(m_shCoeffs[0]);
 
-			L1_1 = shRadiance.data[1];
-			L10  = shRadiance.data[2];
-			L11  = shRadiance.data[3];
+		// 	L1_1 = vec3(m_shCoeffs[1]);
+		// 	L10  = vec3(m_shCoeffs[2]);
+		// 	L11  = vec3(m_shCoeffs[3]);
 
-			L2_2 = shRadiance.data[4];
-			L2_1 = shRadiance.data[5];
-			L20  = shRadiance.data[6];
-			L21  = shRadiance.data[7];
-			L22  = shRadiance.data[8];
+		// 	L2_2 = vec3(m_shCoeffs[4]);
+		// 	L2_1 = vec3(m_shCoeffs[5]);
+		// 	L20  = vec3(m_shCoeffs[6]);
+		// 	L21  = vec3(m_shCoeffs[7]);
+		// 	L22  = vec3(m_shCoeffs[8]);
 
-			float x = n.x, y = n.y, z = n.z;
-			float x2 = x*x, y2 = y*y, z2 = z*z;
+		// 	const float x = -n.x;
+		// 	const float y = -n.y;
+		// 	const float z =  n.z;
+		// 	float x2 = x*x, y2 = y*y, z2 = z*z;
 
-			const float A[5] = {
-				pi,
-				pi * 2.0f / 3.0f,
-				pi * 1.0f / 4.0f,
-				0.0f,
-				-pi * 1.0f / 24.0f
-			};
+		// 	vec3 result = L00 * 1.0f/(2.0f*sqrt(pi));;
 
-			vec3 result = L00 * A[0] * 1.0f/(2.0f*sqrt(pi));;
+		// 	result +=	L1_1 * -sqrt(3.0f/(4.0f*pi))*y + 
+		// 				L10  *  sqrt(3.0f/(4.0f*pi))*z + 
+		// 				L11  * -sqrt(3.0f/(4.0f*pi))*x;
 
-			result +=	L1_1 * A[1] * -sqrt(3.0f/(4.0f*pi))*y + 
-						L10  * A[1] *  sqrt(3.0f/(4.0f*pi))*z + 
-						L11  * A[1] * -sqrt(3.0f/(4.0f*pi))*x;
+		// 	result +=	L2_2 *  sqrt(15.0f/( 4.0f*pi))*y*x +
+		// 				L2_1 * -sqrt(15.0f/( 4.0f*pi))*y*z +
+		// 				L20  *  sqrt( 5.0f/(16.0f*pi))*(3.0f*z2-1.0f) +
+		// 				L21  * -sqrt(15.0f/( 4.0f*pi))*x*z +
+		// 				L22  *  sqrt(15.0f/(16.0f*pi))*(x2-y2);
 
-			result +=	L2_2 * A[2] *  sqrt(15.0f/( 4.0f*pi))*y*x +
-						L2_1 * A[2] * -sqrt(15.0f/( 4.0f*pi))*y*z +
-						L20  * A[2] *  sqrt( 5.0f/(16.0f*pi))*(3.0f*z2-1.0f) +
-						L21  * A[2] * -sqrt(15.0f/( 4.0f*pi))*x*z +
-						L22  * A[2] *  sqrt(15.0f/(16.0f*pi))*(x2-y2);
-
-			return result;
-		};
+		// 	return result;
+		// };
 
 		data.m_directionImage.forPixels2D([&](const vec3& direction, ivec2 pixelPos)
 		{
@@ -178,7 +172,7 @@ public:
 
 			vec3 sampleIrradianceSh = max(vec3(0.0f), shEvaluateDiffuse<vec3, L>(shRadiance, direction) / pi);
 
-			vec3 samplesh = max(vec3(0.f), irradiance_coeffs(direction) / pi);
+			//vec3 samplesh = max(vec3(0.f), irradiance_coeffs(direction) / pi);
 			m_irradianceImage.at(pixelPos) = vec4(sampleIrradianceSh, 1.0f);
 		});
 	}

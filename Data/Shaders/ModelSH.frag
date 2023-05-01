@@ -69,9 +69,9 @@ vec3 irradiance_coeffs(vec3 n)
     vec3 L2_2, L2_1, L20, L21, L22;
     get_lighting_SH(L00, L1_1, L10, L11, L2_2, L2_1, L20, L21, L22);
 
-    float x = n.x, y = n.y, z = n.z;
+    float x = -n.x, y = -n.y, z = n.z;
     float x2 = x*x, y2 = y*y, z2 = z*z;
-    vec3 result = L00;
+    vec3 result = L00 * 1.0f/(2.0f*sqrt(PI));
 
     result += L1_1 * -sqrt(3.0f/(4.0f*PI))*y + 
               L10 *   sqrt(3.0f/(4.0f*PI))*z + 
